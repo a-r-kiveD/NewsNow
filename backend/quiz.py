@@ -1,59 +1,73 @@
+import json
 import os
+
 from dotenv import load_dotenv
 from google import genai
+
 from backend.news import get_news
+
 load_dotenv()
-import json
 
-API_KEY = os.getenv("GEMINI_API_KEY")
 
-client = genai.Client(api_key=API_KEY)
+class QuizConfigurationError(Exception):
+    pass
+
+
+class QuizGenerationError(Exception):
+    pass
+
 
 def generate_quiz():
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise QuizConfigurationError("GEMINI_API_KEY is not configured.")
 
-    news = get_news()
+    articles = get_news()
+    if not articles:
+        raise QuizGenerationError("There are no news articles available for a quiz.")
 
     prompt = f"""
 You are a general knowledge quiz generator.
 
 Below are recent news articles:
 
-{news}
+{json.dumps(articles, ensure_ascii=False)}
 
 Create 10 multiple-choice questions based ONLY on these news articles.
-
-Return the result as a JSON array.
-
-Each question must have exactly this structure:
-
+Return ONLY a JSON array with this structure for each question:
 {{
     "question": "The question",
-    "options": [
-        "Option A",
-        "Option B",
-        "Option C",
-        "Option D"
-    ],
+    "options": ["Option A", "Option B", "Option C", "Option D"],
     "answer": "The correct option"
 }}
 
-Rules:
-- Create exactly 10 questions.
-- Each question must have exactly 4 options.
-- The answer must exactly match one of the four options.
-- Use ONLY information from the provided news articles.
-- Do not add explanations.
-- Do not use markdown.
-- Return ONLY the JSON array.
+Each question must have exactly four options, and the answer must exactly
+match one of them. Do not add explanations or markdown.
 """
 
-    response = client.models.generate_content(
-        model="gemini-3.5-flash-lite",
-        contents=prompt
-    )
+    with genai.Client(api_key=api_key) as client:
+        response = client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=prompt,
+        )
 
-    return json.loads(response.text)
+    try:
+        quiz = json.loads(response.text or "")
+    except (json.JSONDecodeError, TypeError) as error:
+        raise QuizGenerationError("The quiz provider returned invalid JSON.") from error
 
-if __name__ == "__main__":
-    quiz = generate_quiz()
-    print(quiz)
+    if not isinstance(quiz, list) or len(quiz) != 10:
+        raise QuizGenerationError("The quiz provider did not return 10 questions.")
+
+    for question in quiz:
+        if (
+            not isinstance(question, dict)
+            or not isinstance(question.get("question"), str)
+            or not isinstance(question.get("options"), list)
+            or len(question["options"]) != 4
+            or not isinstance(question.get("answer"), str)
+            or question["answer"] not in question["options"]
+        ):
+            raise QuizGenerationError("The quiz provider returned an invalid question.")
+
+    return quiz
