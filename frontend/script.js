@@ -6,7 +6,6 @@ let answers = [];
 
 const welcome = document.querySelector(".welcome");
 const quizCard = document.querySelector(".quiz-card");
-const stats = document.querySelector(".stats");
 
 async function startQuiz() {
     const playButton = document.getElementById("playButton");
@@ -92,7 +91,6 @@ function showQuestion() {
     nextButton.addEventListener("click", nextQuestion);
 
     quizCard.append(options, feedback, nextButton);
-    stats.style.display = "none";
 }
 
 function selectAnswer(selectedButton, selectedOption) {
@@ -182,7 +180,17 @@ function showResults() {
     replayButton.type = "button";
     replayButton.textContent = "PLAY AGAIN →";
     replayButton.addEventListener("click", startQuiz);
-    quizCard.append(chart, legend, replayButton);
+
+    const exitButton = document.createElement("button");
+    exitButton.className = "next-button";
+    exitButton.type = "button";
+    exitButton.textContent = "EXIT TO DASHBOARD";
+    exitButton.addEventListener("click", () => window.location.reload());
+
+    const actions = document.createElement("div");
+    actions.className = "results-actions";
+    actions.append(replayButton, exitButton);
+    quizCard.append(chart, legend, actions);
 }
 
 function createLegendItem(colorClass, label, count) {
@@ -196,4 +204,92 @@ function createLegendItem(colorClass, label, count) {
     return item;
 }
 
+function initializeBackgroundDots() {
+    const canvas = document.querySelector(".background-dots");
+    const context = canvas.getContext("2d");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducedMotion.matches) {
+        return;
+    }
+
+    const spacing = 42;
+    const radius = 105;
+    const dots = [];
+    const pointer = { x: -radius, y: -radius };
+    let frame = 0;
+    let pixelRatio = 1;
+
+    function resizeCanvas() {
+        pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(window.innerWidth * pixelRatio);
+        canvas.height = Math.round(window.innerHeight * pixelRatio);
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        dots.length = 0;
+        for (let y = spacing / 2; y < window.innerHeight; y += spacing) {
+            for (let x = spacing / 2; x < window.innerWidth; x += spacing) {
+                dots.push({ x, y, offsetX: 0, offsetY: 0 });
+            }
+        }
+        drawDots(false);
+    }
+
+    function drawDots(animate) {
+        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        let moving = false;
+
+        for (const dot of dots) {
+            const distanceX = dot.x - pointer.x;
+            const distanceY = dot.y - pointer.y;
+            const distance = Math.hypot(distanceX, distanceY);
+            const strength = distance < radius ? (1 - distance / radius) * 15 : 0;
+            const targetX = distance ? (distanceX / distance) * strength : 0;
+            const targetY = distance ? (distanceY / distance) * strength : 0;
+
+            dot.offsetX += (targetX - dot.offsetX) * 0.18;
+            dot.offsetY += (targetY - dot.offsetY) * 0.18;
+            if (Math.abs(dot.offsetX - targetX) > 0.1 || Math.abs(dot.offsetY - targetY) > 0.1) {
+                moving = true;
+            }
+
+            context.beginPath();
+            context.arc(dot.x + dot.offsetX, dot.y + dot.offsetY, 1.5, 0, Math.PI * 2);
+            context.fillStyle = "rgba(23, 72, 62, 0.22)";
+            context.fill();
+        }
+
+        if (animate && moving) {
+            frame = window.requestAnimationFrame(() => drawDots(true));
+        } else {
+            frame = 0;
+        }
+    }
+
+    window.addEventListener("pointermove", (event) => {
+        if (event.pointerType !== "mouse") {
+            return;
+        }
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        if (!frame) {
+            frame = window.requestAnimationFrame(() => drawDots(true));
+        }
+    });
+
+    window.addEventListener("pointerout", (event) => {
+        if (event.relatedTarget) {
+            return;
+        }
+        pointer.x = -radius;
+        pointer.y = -radius;
+        if (!frame) {
+            frame = window.requestAnimationFrame(() => drawDots(true));
+        }
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+}
+
+initializeBackgroundDots();
 document.getElementById("playButton").addEventListener("click", startQuiz);

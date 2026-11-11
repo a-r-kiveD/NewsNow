@@ -16,10 +16,21 @@ body {
     min-height: 100vh;
 }
 
+.background-dots {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
 
 /* ---------- APP ---------- */
 
 .app {
+    position: relative;
+    z-index: 1;
     width: 100%;
     max-width: 1100px;
     margin: auto;
@@ -37,7 +48,7 @@ body {
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 800;
     letter-spacing: 2px;
 }
@@ -53,7 +64,39 @@ body {
 /* ---------- WELCOME ---------- */
 
 .welcome {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(240px, 0.9fr);
+    align-items: center;
+    gap: 30px;
     margin-bottom: 45px;
+}
+
+.welcome-art {
+    position: relative;
+    width: min(100%, 450px);
+    aspect-ratio: 4 / 3;
+    justify-self: end;
+    transform: rotate(-4deg) translateX(12px);
+}
+
+.welcome-mascot {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 12%;
+    width: 68%;
+    height: auto;
+    filter: drop-shadow(0 10px 12px rgba(23, 72, 62, 0.12));
+}
+
+.welcome-art svg {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
 }
 
 .small-text {
@@ -90,6 +133,10 @@ h1 {
     max-width: 950px;
 }
 
+.quiz-mode .welcome {
+    display: block;
+}
+
 
 /* ---------- QUIZ CARD ---------- */
 
@@ -108,6 +155,31 @@ h1 {
     min-height: auto;
 
     box-shadow: 0 15px 40px rgba(23, 72, 62, 0.15);
+}
+
+.quiz-info {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.question-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: rgba(220, 238, 232, 0.15);
+    color: #dceee8;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.quiz-info h2,
+.quiz-info p {
+    margin: 0;
 }
 
 
@@ -224,6 +296,17 @@ h1 {
     gap: 24px;
 }
 
+.results-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.results-actions .next-button {
+    margin-top: 0;
+}
+
 .results-chart {
     display: grid;
     width: 220px;
@@ -296,6 +379,7 @@ h1 {
     background: #dceee8;
     color: #17483e;
 
+    margin-top: 20px;
     padding: 18px 25px;
 
     border: none;
@@ -366,6 +450,18 @@ h1 {
         margin-bottom: 55px;
     }
 
+    .logo {
+        font-size: 28px;
+    }
+
+    .welcome {
+        display: block;
+    }
+
+    .welcome-art {
+        display: none;
+    }
+
     h1 {
         font-size: 46px;
     }
@@ -387,6 +483,11 @@ h1 {
 
     .next-button {
         width: 100%;
+    }
+
+    .results-actions {
+        width: 100%;
+        flex-direction: column;
     }
 
     .results-chart {

@@ -5,22 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>GK Now</title>
+    <title>KnowNOW</title>
 
+    <link rel="icon" type="image/png" href="news-mascot.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+    <canvas class="background-dots" aria-hidden="true"></canvas>
+
     <div class="app">
 
         <!-- Header -->
         <header class="header">
-            <div class="logo">GK NOW</div>
-
-            <div class="streak">
-                🔥 0
-            </div>
+            <div class="logo">KnowNOW</div>
         </header>
 
 
@@ -28,16 +27,43 @@
         <main>
 
             <section class="welcome">
-                <p class="small-text">WELCOME BACK</p>
+                <div class="welcome-copy">
+                    <p class="small-text">WELCOME BACK</p>
 
-                <h1>
-                    Know what's<br>
-                    happening.
-                </h1>
+                    <h1>
+                        Know what's<br>
+                        happening.
+                    </h1>
 
-                <p class="subtitle">
-                    Test yourself on what's happening around the world.
-                </p>
+                    <p class="subtitle">
+                        Test yourself on what's happening around the world.
+                    </p>
+                </div>
+
+                <div class="welcome-art" aria-hidden="true">
+                    <img class="welcome-mascot" src="news-mascot.png" alt="">
+                    <svg viewBox="0 0 420 280" role="presentation">
+                        <defs>
+                            <linearGradient id="paint" x1="0" y1="1" x2="1" y2="0">
+                                <stop offset="0" stop-color="#17483e"/>
+                                <stop offset="0.55" stop-color="#2e8875"/>
+                                <stop offset="1" stop-color="#6bb49a"/>
+                            </linearGradient>
+                            <filter id="paint-texture" x="-10%" y="-10%" width="120%" height="120%">
+                                <feTurbulence baseFrequency="0.035" numOctaves="2" seed="8" type="fractalNoise"/>
+                                <feDisplacementMap in="SourceGraphic" scale="3"/>
+                            </filter>
+                        </defs>
+                        <g fill="url(#paint)" filter="url(#paint-texture)">
+                            <path d="M22 231 C67 204 92 181 139 158 C194 131 231 115 274 83 C319 50 352 22 397 9 C380 34 367 55 345 74 C311 104 280 122 246 141 C205 164 160 178 122 198 C82 219 52 238 22 231Z"/>
+                            <path d="M67 247 C112 220 145 206 181 189 C225 168 260 155 298 130 C335 105 371 74 407 57 C386 85 367 106 343 123 C306 149 274 164 239 179 C193 198 158 215 123 234 C100 247 83 254 67 247Z" opacity=".8"/>
+                            <path d="M12 216 C54 190 90 166 122 151 C107 173 80 192 55 210 C36 223 23 231 12 216Z" opacity=".72"/>
+                            <path d="M106 219 C173 187 228 162 290 123 C330 98 357 75 386 48" fill="none" stroke="#b3daca" stroke-linecap="round" stroke-width="2.5" opacity=".65"/>
+                            <path d="M80 231 C146 194 207 174 260 144 C311 115 344 89 374 59" fill="none" stroke="#d2e8dd" stroke-linecap="round" stroke-width="1.5" opacity=".6"/>
+                            <path d="M166 203 C221 174 273 153 319 120 C349 99 371 78 394 53" fill="none" stroke="#17483e" stroke-linecap="round" stroke-width="3" opacity=".35"/>
+                        </g>
+                    </svg>
+                </div>
             </section>
 
 
@@ -51,9 +77,7 @@
                         Current Affairs
                     </h2>
 
-                    <p>
-                        10 questions · Recent news
-                    </p>
+                    <p class="question-count">10 questions</p>
                 </div>
 
                 <button class="play-button" id="playButton">
@@ -61,23 +85,6 @@
                 </button>
 
             </section>
-
-
-            <!-- Stats -->
-            <section class="stats">
-
-                <div class="stat-card">
-                    <span>QUIZZES</span>
-                    <strong>0</strong>
-                </div>
-
-                <div class="stat-card">
-                    <span>BEST SCORE</span>
-                    <strong>—</strong>
-                </div>
-
-            </section>
-
         </main>
 
     </div>

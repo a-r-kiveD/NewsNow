@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "GK Now API is working!"}
+    return {"message": "KnowNOW API is working!"}
 
 
 @app.get("/news")
